@@ -32,7 +32,7 @@ public class HttpServer implements Runnable {
             System.out.println("[Server] 클라이언트 연결 대기중..");
 
             try (Socket socket = serverSocket.accept();
-                 BufferedReader clientIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                 BufferedReader clientIn = new BufferedReader(new InputStreamReader(System.in));
                  PrintWriter clientOut = new PrintWriter(socket.getOutputStream())) {
 
                 System.out.println("[Server] 클라이언트 연결됨: " + socket.getInetAddress());
@@ -48,6 +48,5 @@ public class HttpServer implements Runnable {
                 throw new RuntimeException(e);
             }
         }
-
     }
 }
