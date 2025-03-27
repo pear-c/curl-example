@@ -5,10 +5,10 @@ import java.io.OutputStream;
 import java.net.Socket;
 
 public class HttpClient {
-    boolean isVerbose;
+    boolean verbose;
 
-    public HttpClient(boolean isVerbose) {
-        this.isVerbose = isVerbose;
+    public HttpClient(boolean verbose) {
+        this.verbose = verbose;
     }
 
     public String sendRequest(HttpRequest request) {
@@ -23,9 +23,14 @@ public class HttpClient {
             OutputStream out = socket.getOutputStream();
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
 
+            if(verbose) {
+                System.out.println("* Trying " + socket.getInetAddress() + ":" + port + "...");
+                System.out.println("* Connected to " + host + " (" + socket.getInetAddress() + ") port " + port + " (#0)");
+                System.out.println("> " + request.toString().replaceAll("\n", "\n> "));
+            }
+
             out.write(request.toString().getBytes());
             out.flush();
-
 
             String line;
             int contentLength = -1;
@@ -40,22 +45,33 @@ public class HttpClient {
                 if(line.startsWith("Content-Length:")) {
                     contentLength = Integer.parseInt(line.split(":")[1].trim());
                 }
+
+                if(verbose) {
+                    System.out.println("< " + line);
+                }
             }
 
-            // Body 부분
-            char[] body = new char[contentLength];
-            in.read(body, 0, contentLength);
-            bodySb.append(new String(body));
+            if(contentLength > 0) {
+                // Body 부분
+                char[] body = new char[contentLength];
+                in.read(body, 0, contentLength);
+                bodySb.append(new String(body));
+
+                if(verbose) {
+                    System.out.println("< " + new String(body));
+                }
+            }
+
 
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
 
         // -v 옵션 있을 때는 헤더 + body 둘다 출력
-        if(isVerbose) {
+        if(verbose) {
             return headerSb.append(bodySb).toString();
+        } else {
+            return bodySb.toString();
         }
-
-        return bodySb.toString();
     }
 }
