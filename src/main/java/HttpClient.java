@@ -1,28 +1,40 @@
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.Socket;
 
 public class HttpClient {
-    private static final int DEFAULT_PORT = 80;
-    private static final String DEFAULT_HTTP_VERSION = "HTTP/1.1";
+    private static final String httpVersion = "HTTP/1.1";
 
-    private String url;
-
-    private String protocol;
     private String method;
-    private String host;
-    private String header;
-    private String data;
+    private XUrl xurl;
 
-
-    public HttpClient(String url) {
-        this.url = url;
+    public HttpClient(String method, String url) {
+        xurl = new XUrl(url);
+        this.method = method;
     }
 
-    static void parsingURL(String url) {
+    public void sendRequest() {
+        try(Socket socket = new Socket(xurl.getHost(), xurl.getPort());
+            OutputStream out = socket.getOutputStream();
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))
+            ) {
 
+            String requestLine = method + " " + xurl.getPath() + " " + httpVersion + "\r\n" +
+                    "Host: " + xurl.getHost() + "\r\n" +
+                    "\r\n";
 
+            out.write(requestLine.getBytes());
+
+            String line;
+            boolean flag = false;
+            while((line = in.readLine()) != null) {
+                if(flag) System.out.println(line);
+                if(line.isEmpty()) flag = true;
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
-
-
-
 }
