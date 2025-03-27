@@ -3,59 +3,57 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.util.Map;
 
 public class HttpClient {
-    private XUrl xurl;
-    private String method;
 
-    private String requestLine;
-    private Map<String, String> headers;
-    private Map<String, String> body;
+    public HttpClient() {
 
-
-    public HttpClient(String method, String url) {
-        xurl = new XUrl(url);
-        this.method = method;
-
-        requestLine = this.method + " " + xurl.getPath() + " " + xurl.getHttpVersion() + "\r\n" +
-                "Host: " + xurl.getHost() + "\r\n" +
-                "User-Agent: curl/7.79.1\r\n" +
-                "Accept: */*\r\n" +
-                "\r\n";
     }
 
-    public void sendRequest() {
-        try(Socket socket = new Socket(xurl.getHost(), xurl.getPort());
+    public String sendRequest(HttpRequest request) {
+        StringBuilder response = new StringBuilder();
+
+        XUrl url = request.getUrl();
+        String host = url.getHost();
+        int port = url.getPort();
+
+        try(Socket socket = new Socket(host, port);
             OutputStream out = socket.getOutputStream();
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))
-            ) {
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
 
-            String requestLine = method + " " + xurl.getPath() + " " + xurl.getHttpVersion() + "\r\n" +
-                    "Host: " + xurl.getHost() + "\r\n" +
-                    "User-Agent: curl/7.79.1\r\n" +
-                    "Accept: */*\r\n" +
-                    "\r\n";
+            out.write(request.toString().getBytes());
 
-            out.write(requestLine.getBytes());
-
-            printDefaultResponse(socket, in);
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void printDefaultResponse(Socket socket, BufferedReader in) {
-        try {
+            // 1️⃣ 응답 헤더 읽기
             String line;
-            boolean flag = false;
-            while((line = in.readLine()) != null) {
-                if(flag) System.out.println(line);
-                if(line.isEmpty()) flag = true;
+            int contentLength = 0;
+            boolean isHeader = true;
+
+            while ((line = in.readLine()) != null) {
+                response.append(line).append("\n");
+
+                // 헤더 끝을 감지 (빈 줄)
+                if (line.isEmpty()) {
+                    isHeader = false;
+                    break;
+                }
+
+                // Content-Length 추출
+                if (line.toLowerCase().startsWith("content-length:")) {
+                    contentLength = Integer.parseInt(line.split(":")[1].trim());
+                }
             }
+
+            // 2️⃣ 응답 바디 읽기 (Content-Length 기준)
+            char[] bodyBuffer = new char[contentLength];
+            int readBytes = in.read(bodyBuffer, 0, contentLength);
+            if (readBytes > 0) {
+                response.append(new String(bodyBuffer, 0, readBytes));
+            }
+
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println(e.getMessage());
         }
+
+        return response.toString();
     }
 }

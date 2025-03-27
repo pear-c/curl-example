@@ -3,7 +3,6 @@ import org.apache.commons.cli.*;
 public class CommandParser {
     private Options options = new Options();
     private CommandLineParser parser = new DefaultParser();
-
     private CommandLine cmd;
 
     public CommandParser(String[] args) {
