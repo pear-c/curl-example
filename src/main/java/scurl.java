@@ -6,10 +6,10 @@ public class scurl {
     public static void main(String[] args) {
         CommandParser commandParser = new CommandParser(args);
 
+        String url = commandParser.getUrl();
         String method = commandParser.getMethod();
         String header = commandParser.getHeader();
         String data = commandParser.getData();
-        String url = commandParser.getUrl();
 
         try {
             Socket socket = new Socket("httpbin.org", 80);
