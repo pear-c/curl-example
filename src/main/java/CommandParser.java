@@ -47,4 +47,14 @@ public class CommandParser {
     public String getFile() {
         return cmd.getOptionValue("F", "");
     }
+
+    public String getUrl() {
+        String[] remainingArgs = cmd.getArgs();
+
+        if(remainingArgs.length < 2) {
+            return "Usage: scurl [option] url";
+        }
+
+        return remainingArgs[2];
+    }
 }
