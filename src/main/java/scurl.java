@@ -19,7 +19,7 @@ public class scurl {
         headers.put("Accept", "*/*");
 
         // body 설정
-        String body = commandParser.getData();
+        String body = "";
 
         // HttpRequest 객체
         HttpRequest httpRequest = new HttpRequest(method, url, headers, body);
@@ -27,11 +27,6 @@ public class scurl {
         // HttpClient
         HttpClient httpClient = new HttpClient();
 
-        try {
-            String response = httpClient.sendRequest(httpRequest);
-            System.out.println(response);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        httpClient.sendRequest(httpRequest);
     }
 }
