@@ -1,7 +1,9 @@
 public class XUrl {
+    private static final int DEFAULT_PORT = 80;
+    private static final String DEFAULT_HTTP_VERSION = "HTTP/1.1";
+
     private String scheme;
     private String host;
-    private int port = 80;
     private String path;
 
     public XUrl(String url) {
@@ -32,10 +34,14 @@ public class XUrl {
     }
 
     public int getPort() {
-        return port;
+        return DEFAULT_PORT;
     }
 
     public String getPath() {
         return path;
+    }
+
+    public String getHttpVersion() {
+        return DEFAULT_HTTP_VERSION;
     }
 }
