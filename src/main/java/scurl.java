@@ -25,8 +25,10 @@ public class scurl {
         HttpRequest httpRequest = new HttpRequest(method, url, headers, body);
 
         // HttpClient
-        HttpClient httpClient = new HttpClient();
+        HttpClient httpClient = new HttpClient(commandParser.isVerbose());
 
-        httpClient.sendRequest(httpRequest);
+        // 요청 - 응답
+        String response = httpClient.sendRequest(httpRequest);
+        System.out.println(response);
     }
 }

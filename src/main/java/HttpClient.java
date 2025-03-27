@@ -5,12 +5,16 @@ import java.io.OutputStream;
 import java.net.Socket;
 
 public class HttpClient {
+    boolean isVerbose;
 
-    public HttpClient() {
-
+    public HttpClient(boolean isVerbose) {
+        this.isVerbose = isVerbose;
     }
 
-    public void sendRequest(HttpRequest request) {
+    public String sendRequest(HttpRequest request) {
+        StringBuilder headerSb = new StringBuilder();  // Header
+        StringBuilder bodySb = new StringBuilder();    // Body
+
         XUrl url = request.getUrl();
         String host = url.getHost();
         int port = url.getPort();
@@ -20,14 +24,38 @@ public class HttpClient {
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
 
             out.write(request.toString().getBytes());
+            out.flush();
+
 
             String line;
+            int contentLength = -1;
+
             while((line = in.readLine()) != null) {
-                System.out.println(line);
+                headerSb.append(line).append("\n"); // 헤더 부분
+
+                if(line.isEmpty()) {
+                    break;
+                }
+
+                if(line.startsWith("Content-Length:")) {
+                    contentLength = Integer.parseInt(line.split(":")[1].trim());
+                }
             }
+
+            // Body 부분
+            char[] body = new char[contentLength];
+            in.read(body, 0, contentLength);
+            bodySb.append(new String(body));
 
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
+
+        // -v 옵션 있을 때는 헤더 + body 둘다 출력
+        if(isVerbose) {
+            return headerSb.append(bodySb).toString();
+        }
+
+        return bodySb.toString();
     }
 }
