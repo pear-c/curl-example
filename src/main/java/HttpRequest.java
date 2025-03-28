@@ -33,8 +33,8 @@ public class HttpRequest {
         return headers;
     }
 
-    public String getHeader(String key) {
-        return headers.getOrDefault(key, null);
+    public void addHeader(String key, String value) {
+        headers.put(key, value);
     }
 
     public String getBody() {

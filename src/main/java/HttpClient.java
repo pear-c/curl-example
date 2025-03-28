@@ -24,8 +24,8 @@ public class HttpClient {
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
 
             if(verbose) {
-                System.out.println("* Trying " + socket.getInetAddress() + ":" + port + "...");
-                System.out.println("* Connected to " + host + " (" + socket.getInetAddress() + ") port " + port + " (#0)");
+                System.out.println("* Trying " + socket.getLocalAddress().toString().substring(1) + ":" + port + "...");
+                System.out.println("* Connected to " + host + " (" + socket.getLocalAddress().toString().substring(1) + ") port " + port + " (#0)");
                 System.out.println("> " + request.toString().replaceAll("\n", "\n> "));
             }
 

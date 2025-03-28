@@ -62,4 +62,15 @@ public class CommandParser {
         HelpFormatter formatter = new HelpFormatter();
         formatter.printHelp("scurl [option] url", options);
     }
+
+    // 헤더 추가
+    public void applyHeadersToRequest(HttpRequest httpRequest) {
+        String header = getHeader();
+        if(!header.isEmpty()) {
+            String[] parts = header.split(":", 2);
+            if(parts.length == 2) {
+                httpRequest.addHeader(parts[0].trim(), parts[1].trim());
+            }
+        }
+    }
 }
